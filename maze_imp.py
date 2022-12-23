@@ -3,7 +3,7 @@
 # Create a maze using the depth-first algorithm described at
 # https://scipython.com/blog/making-a-maze/
 # Christian Hill, April 2017.
-# Some part of the code taken from 
+# Some of the code taken from here as well
 import random
 
 class Empty(RuntimeError):
@@ -170,20 +170,26 @@ class Maze:
         return rand_neighbor
 
     def make_path(self, x, y):
+        """"Recursively create a maze using the Depth-First-Search algorithm"""
+
+        #Base case: Return if the number of visited cells equal the total number of cells
         if self.num_visited == (self.hieght * self.width):
             return
 
         self.maze[x][y].visit() 
 
+        # Choose a random neighbouring cell and move to it.
         x_neighbor, y_neighbor = self.get_neighbors(x,y)
         
         if x_neighbor == '' or y_neighbor == '':
             if not self.prev_visited.is_empty():
+                # We've reached a dead end: backtrack.
                 x_back,y_back = self.prev_visited.pop()
                 self.make_path(x_back, y_back)
         else:
             self.maze[x][y].break_wall(self.maze[x_neighbor][y_neighbor])
             self.prev_visited.push((x,y))
+            # Total number of visited cells during maze construction.
             self.num_visited += 1
 
             self.make_path(x_neighbor,y_neighbor)
@@ -196,7 +202,7 @@ class Maze:
 
     def write_svg(self, filename):
         """Write an SVG image of the maze to filename.
-           This code is taken as it is from: """
+           This code is taken as it is from: https://scipython.com/blog/making-a-maze/"""
 
         aspect_ratio = self.width / self.hieght
         # Pad the maze all around by this amount.
