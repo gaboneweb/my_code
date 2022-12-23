@@ -169,7 +169,7 @@ class Maze:
 if __name__ == '__main__':
 
     # Maze dimensions (ncols, nrows)
-    nx, ny = 15, 15
+    nx, ny = 15, 5
     # Maze entry position
     ix, iy = 0, 0
 
