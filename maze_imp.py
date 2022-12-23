@@ -143,11 +143,15 @@ class Maze:
                 row.append(Cell(i,j))
 
             self.maze.append(row)
+
+
     def is_valid_pos(self, x, y):
         x_valid = x >= 0 and x <= self.hieght -1
         y_valid = y >= 0 and y <= self.width -1
 
         return x_valid and y_valid
+
+
     def get_neighbors(self, x, y):
 
         pos_neighbors = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
@@ -164,11 +168,11 @@ class Maze:
     def make_path(self, x, y):
         if self.num_visited == (self.hieght * self.width):
             return
-
+        print(f"{x}  {y}")
         self.maze[x][y].visited = True
         self.maze[x][y].value = 'C'
         x_neighbor, y_neighbor = self.get_neighbors(x,y)
-        # print(x_neighbor,y_neighbor)
+        
         if x_neighbor == ' ' or y_neighbor == ' ':
             if not self.prev_visited.is_empty():
                 x_back,y_back = self.prev_visited.pop()
@@ -181,8 +185,6 @@ class Maze:
 
             self.make_path(x_neighbor,y_neighbor)
         
-        
-
 
     def print_grid(self):
 
@@ -199,10 +201,10 @@ class Maze:
 if __name__ == '__main__':
 
 
-    hieght = 20
-    width = 20
+    hieght = random.randint(5,20)
+    width = random.randint(5,20)
     start_h = random.randint(0,hieght - 1)
-    start_w = random.randint(0,hieght - 1)
+    start_w = random.randint(0,width - 1)
     
     maze = Maze(hieght,width)
     maze.create_grid()
