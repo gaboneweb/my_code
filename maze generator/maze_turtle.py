@@ -1,5 +1,5 @@
 import turtle
-from maze_imp import *
+from maze_imp import Maze
 
 screen = turtle.getscreen()
 
@@ -75,8 +75,8 @@ if __name__ == '__main__':
     maze = Maze(20,20)
     maze.create_grid()
     # draw_maze(maze.maze)
-
-    maze.make_path(0,0)
+    start_cell = maze.maze[0][0]
+    maze.make_path(start_cell)
     print(maze)
 
     draw_maze(maze.maze)

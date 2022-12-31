@@ -47,11 +47,16 @@ class Cell:
         self.walls = {'N':True, 'S':True, 'E':True, 'W': True}
         self.x = x
         self.y = y
+        self.g_n = 0
+        self.h_n = 0
+        self.f_n = self.g_n + self.h_n
         
 
 
     def __str__(self) -> str:
         return self.value
+
+
     def break_wall(self,neighbor):
         if self.x == neighbor.x:
             if neighbor.y > self.y:
@@ -79,6 +84,13 @@ class Cell:
 
     def visit(self):
         self._visited = True
+
+    def un_visit(self):
+        self._visited = False
+
+    def cal_fn(self):
+        self.f_n = self.g_n + self.h_n
+        
 
 class Maze:
     def __init__(self,hieght,width) -> None:
@@ -146,7 +158,7 @@ class Maze:
         return x_valid and y_valid
 
 
-    def get_neighbors(self, x, y):
+    def get_neighbors(self, current_cell):
         """Gets the position of  random neighbor that has not been visited.
 
         Args:
@@ -157,42 +169,44 @@ class Maze:
             tuple: The x(row) and y(column) of a neighbor that has not been visited.If all neighbors have
                     been visted,return an tuple containg string spaces
         """
+        x, y = current_cell.x, current_cell.y
 
         pos_neighbors = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
 
         not_vis_neigbors = [(x,y) for x,y in pos_neighbors if self.is_valid_pos(x,y) and not self.maze[x][y].is_visited()]
 
         if len(not_vis_neigbors) > 0:
-            rand_neighbor = not_vis_neigbors[random.randint(0,len(not_vis_neigbors) - 1)]
+            x_, y_ = not_vis_neigbors[random.randint(0,len(not_vis_neigbors) - 1)]
+            rand_neighbor = self.maze[x_][y_]
         else:
-            rand_neighbor = '', ''
+            rand_neighbor = None
 
         return rand_neighbor
 
-    def make_path(self, x, y):
+    def make_path(self,current_cell):
         """"Recursively create a maze using the Depth-First-Search algorithm"""
 
         #Base case: Return if the number of visited cells equal the total number of cells
         if self.num_visited == (self.hieght * self.width):
             return
 
-        self.maze[x][y].visit() 
+        current_cell.visit() 
 
         # Choose a random neighbouring cell and move to it.
-        x_neighbor, y_neighbor = self.get_neighbors(x,y)
+        neighbor = self.get_neighbors(current_cell)
         
-        if x_neighbor == '' or y_neighbor == '':
+        if neighbor == None:
             if not self.prev_visited.is_empty():
                 # We've reached a dead end: backtrack.
-                x_back,y_back = self.prev_visited.pop()
-                self.make_path(x_back, y_back)
+                new_curr_cell = self.prev_visited.pop()
+                self.make_path(new_curr_cell)
         else:
-            self.maze[x][y].break_wall(self.maze[x_neighbor][y_neighbor])
-            self.prev_visited.push((x,y))
+            current_cell.break_wall(neighbor)
+            self.prev_visited.push(current_cell)
             # Total number of visited cells during maze construction.
             self.num_visited += 1
 
-            self.make_path(x_neighbor,y_neighbor)
+            self.make_path(neighbor)
 
 
     def cell_at(self, x, y):
@@ -251,18 +265,41 @@ class Maze:
             print('<line x1="0" y1="0" x2="0" y2="{}"/>'.format(height), file=f)
             print('</svg>', file=f)
 
+    def reset(self):
+        for row in self.maze:
+            for cell in row:
+                cell.un_visit()
+    def get_h(self,curr, goal):
+
+    
+        h_x = curr.x - goal.x 
+        h_y = curr.y - goal.y 
+
+        return h_x + h_y
+
+
+    def solve_maze(self,start, goal):
+        self.reset()
+        start.h_n = self.get_h(start,goal)
+        start.cal_fn()
+        def get_lowest_cost(start):
+            pass
+        
+        
+        pass
+
         
 
 if __name__ == '__main__':
 
 
-    hieght ,width= random.randint(5,20), random.randint(5,20)
+    hieght ,width=5,5 # random.randint(5,20), random.randint(5,20)
     start_h, start_w = random.randint(0,hieght - 1), random.randint(0,width - 1)
 
     maze = Maze(hieght,width)
     maze.create_grid()
-
-    maze.make_path(start_h,start_w)
+    start_cell = maze.maze[start_h][start_w]
+    maze.make_path(start_cell)
 
     print(maze)
     maze.write_svg('maze_mine.svg')
