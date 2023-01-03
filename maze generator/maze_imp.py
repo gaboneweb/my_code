@@ -188,6 +188,8 @@ class Maze:
 
         #Base case: Return if the number of visited cells equal the total number of cells
         if self.num_visited == (self.hieght * self.width):
+        
+            self.reset()
             return
 
         current_cell.visit() 
@@ -266,6 +268,7 @@ class Maze:
             print('</svg>', file=f)
 
     def reset(self):
+        self.num_visited = 0
         for row in self.maze:
             for cell in row:
                 cell.un_visit()
@@ -279,7 +282,6 @@ class Maze:
 
 
     def solve_maze(self,start, goal):
-        self.reset()
         start.h_n = self.get_h(start,goal)
         start.cal_fn()
         def get_lowest_cost(start):
